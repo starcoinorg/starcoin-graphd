@@ -2,7 +2,6 @@ use crate::chain_reader::ChainReader;
 use crate::dag_graph::{DagEdge, DagGraphProvider, DagNode, NodeColor};
 use async_trait::async_trait;
 use starcoin_crypto::HashValue;
-use starcoin_types::block::{BlockHeader, BlockNumber};
 use std::collections::{HashMap, HashSet, VecDeque};
 
 #[async_trait]
@@ -10,7 +9,7 @@ pub trait ChainReaderExt: Send + Sync {
     // get selected chain by blue score number-count to number
     async fn get_selected_chain(
         &self,
-        number: Option<BlockNumber>,
+        number: Option<u64>,
         count: u64,
     ) -> anyhow::Result<Vec<BlockHeader>>;
 
@@ -22,12 +21,33 @@ pub trait ChainReaderExt: Send + Sync {
     async fn get_headers(&self, ids: &[HashValue]) -> anyhow::Result<Vec<BlockHeader>>;
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct GhostdagData {
     pub blue_score: u64,
     pub selected_parent: HashValue,
     pub mergeset_blues: Vec<HashValue>,
     pub mergeset_reds: Vec<HashValue>,
+}
+
+#[derive(Clone, Debug)]
+pub struct BlockHeader {
+    pub id: HashValue,
+    pub number: u64,
+    pub parents_hash: Vec<HashValue>,
+}
+
+impl BlockHeader {
+    pub fn id(&self) -> HashValue {
+        self.id
+    }
+
+    pub fn number(&self) -> u64 {
+        self.number
+    }
+
+    pub fn parents_hash(&self) -> Vec<HashValue> {
+        self.parents_hash.clone()
+    }
 }
 
 pub struct DagBuildContext {

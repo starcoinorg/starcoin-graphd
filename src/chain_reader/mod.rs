@@ -12,3 +12,4 @@ pub trait ChainReader {
 
 pub mod ext;
 pub mod mock;
+pub mod rpc;

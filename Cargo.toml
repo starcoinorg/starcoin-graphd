@@ -12,6 +12,8 @@ starcoin-types = { git = "https://github.com/starcoinorg/starcoin", branch = "da
 starcoin-crypto = { git = "https://github.com/starcoinorg/starcoin-crypto", rev = "8d41c280a227594ca0a2b6ecba580643518274ea" }
 async-trait = "0.1.88"
 anyhow = "~1"
+reqwest = { version = "0.12.15", features = ["json"] }
+hex = "0.4.3"
 [[bin]]
 name = "starcoin-graphd"
 path = "src/main.rs"

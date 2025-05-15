@@ -1,7 +1,6 @@
-use crate::chain_reader::ext::GhostdagData;
+use crate::chain_reader::ext::{BlockHeader, GhostdagData};
 use async_trait::async_trait;
 use starcoin_crypto::HashValue;
-use starcoin_types::block::{BlockHeader, BlockHeaderBuilder, BlockNumber};
 use std::collections::HashMap;
 
 use super::ext::ChainReaderExt;
@@ -13,35 +12,61 @@ pub struct MockChainReader {
 
 impl MockChainReader {
     pub fn new() -> Self {
-        let block_a = BlockHeader::dag_genesis_random(0);
-        let block_b = BlockHeaderBuilder::random()
-            .with_number(1)
-            .with_parents_hash(vec![block_a.id()])
-            .build();
-        let block_c = BlockHeaderBuilder::random()
-            .with_number(2)
-            .with_parents_hash(vec![block_b.id()])
-            .build();
-        let block_d = BlockHeaderBuilder::random()
-            .with_number(3)
-            .with_parents_hash(vec![block_b.id()])
-            .build();
-        let block_e = BlockHeaderBuilder::random()
-            .with_number(4)
-            .with_parents_hash(vec![block_c.id(), block_d.id()])
-            .build();
-        let block_f = BlockHeaderBuilder::random()
-            .with_number(5)
-            .with_parents_hash(vec![block_d.id()])
-            .build();
-        let block_g = BlockHeaderBuilder::random()
-            .with_number(6)
-            .with_parents_hash(vec![block_d.id()])
-            .build();
-        let block_h = BlockHeaderBuilder::random()
-            .with_number(6)
-            .with_parents_hash(vec![block_e.id(), block_f.id(), block_g.id()])
-            .build();
+        // genesis block A
+        let block_a = BlockHeader {
+            id: HashValue::random(),
+            number: 0,
+            parents_hash: vec![],
+        };
+
+        // block B
+        let block_b = BlockHeader {
+            id: HashValue::random(),
+            number: 1,
+            parents_hash: vec![block_a.id],
+        };
+
+        // block C
+        let block_c = BlockHeader {
+            id: HashValue::random(),
+            number: 2,
+            parents_hash: vec![block_b.id],
+        };
+
+        // block D
+        let block_d = BlockHeader {
+            id: HashValue::random(),
+            number: 3,
+            parents_hash: vec![block_b.id],
+        };
+
+        // block E
+        let block_e = BlockHeader {
+            id: HashValue::random(),
+            number: 4,
+            parents_hash: vec![block_c.id, block_d.id],
+        };
+
+        // block F
+        let block_f = BlockHeader {
+            id: HashValue::random(),
+            number: 5,
+            parents_hash: vec![block_d.id],
+        };
+
+        // block G
+        let block_g = BlockHeader {
+            id: HashValue::random(),
+            number: 6,
+            parents_hash: vec![block_d.id],
+        };
+
+        // block H
+        let block_h = BlockHeader {
+            id: HashValue::random(),
+            number: 7,
+            parents_hash: vec![block_e.id, block_f.id, block_g.id],
+        };
 
         let mut ghostdag_map = HashMap::new();
         let ghostdag_b = GhostdagData {
@@ -118,7 +143,7 @@ impl MockChainReader {
 impl ChainReaderExt for MockChainReader {
     async fn get_selected_chain(
         &self,
-        _number: Option<BlockNumber>,
+        _number: Option<u64>,
         _count: u64,
     ) -> anyhow::Result<Vec<BlockHeader>> {
         Ok(self.selected_chain.clone())
