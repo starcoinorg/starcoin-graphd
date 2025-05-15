@@ -1,2 +1,2 @@
 pub mod chain_reader;
-pub mod graph;
+pub mod dag_graph;

@@ -1,5 +1,5 @@
-use starcoin_graphd::graph::DagGraph;
 use starcoin_graphd::chain_reader::mock::MockChainReader;
+use starcoin_graphd::dag_graph::DagGraph;
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let reader = MockChainReader::new();

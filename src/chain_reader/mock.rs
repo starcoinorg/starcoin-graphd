@@ -1,8 +1,10 @@
-use crate::chain_reader::{ChainReader, GhostdagData};
+use crate::chain_reader::ext::GhostdagData;
 use async_trait::async_trait;
 use starcoin_crypto::HashValue;
 use starcoin_types::block::{BlockHeader, BlockHeaderBuilder, BlockNumber};
 use std::collections::HashMap;
+
+use super::ext::ChainReaderExt;
 pub struct MockChainReader {
     selected_chain: Vec<BlockHeader>,
     ghostdag_map: HashMap<HashValue, GhostdagData>,
@@ -11,16 +13,6 @@ pub struct MockChainReader {
 
 impl MockChainReader {
     pub fn new() -> Self {
-        // Construct a simple DAG:
-        // A (genesis)
-        //  \
-        //   B (selected, parent: A)
-        //   |\
-        //   | C (merge blue, parent: A)
-        //   | D (merge red, parent: A)
-        //
-        // E (selected, parent: B)
-
         let block_a = BlockHeader::dag_genesis_random(0);
         let block_b = BlockHeaderBuilder::random()
             .with_number(1)
@@ -109,9 +101,9 @@ impl MockChainReader {
         header_map.insert(block_c.id(), block_c.clone());
         header_map.insert(block_d.id(), block_d.clone());
         header_map.insert(block_e.id(), block_e.clone());
-	header_map.insert(block_f.id(), block_f.clone());
-	header_map.insert(block_g.id(), block_g.clone());
-	header_map.insert(block_h.id(), block_h.clone());
+        header_map.insert(block_f.id(), block_f.clone());
+        header_map.insert(block_g.id(), block_g.clone());
+        header_map.insert(block_h.id(), block_h.clone());
         let selected_chain = vec![block_b, block_c, block_e, block_h];
 
         Self {
@@ -123,7 +115,7 @@ impl MockChainReader {
 }
 
 #[async_trait]
-impl ChainReader for MockChainReader {
+impl ChainReaderExt for MockChainReader {
     async fn get_selected_chain(
         &self,
         _number: Option<BlockNumber>,
@@ -132,15 +124,22 @@ impl ChainReader for MockChainReader {
         Ok(self.selected_chain.clone())
     }
 
-    async fn get_ghostdag_data(&self, hash: HashValue) -> anyhow::Result<Option<GhostdagData>> {
-        Ok(self.ghostdag_map.get(&hash).cloned())
+    async fn get_ghostdag_data(
+        &self,
+        ids: &[HashValue],
+    ) -> anyhow::Result<Vec<Option<GhostdagData>>> {
+        let ret: Vec<Option<GhostdagData>> = ids
+            .iter()
+            .map(|id| self.ghostdag_map.get(id).cloned())
+            .collect();
+        Ok(ret)
     }
 
-    async fn get_headers(&self, block_hashes: Vec<HashValue>) -> anyhow::Result<Vec<BlockHeader>> {
-        let result = block_hashes
-            .into_iter()
-            .filter_map(|id| self.header_map.get(&id).cloned())
+    async fn get_headers(&self, ids: &[HashValue]) -> anyhow::Result<Vec<BlockHeader>> {
+        let ret = ids
+            .iter()
+            .filter_map(|id| self.header_map.get(id).cloned())
             .collect();
-        Ok(result)
+        Ok(ret)
     }
 }
