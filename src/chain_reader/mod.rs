@@ -1,5 +1,5 @@
-use async_trait::async_trait;
 use crate::dag_graph::DagGraphProvider;
+use async_trait::async_trait;
 
 #[async_trait]
 pub trait ChainReader {
@@ -10,5 +10,5 @@ pub trait ChainReader {
     ) -> anyhow::Result<Box<dyn DagGraphProvider + Send + Sync>>;
 }
 
-pub mod mock;
 pub mod ext;
+pub mod mock;
