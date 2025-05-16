@@ -1,12 +1,16 @@
 use crate::dag_graph::DagGraphProvider;
 use async_trait::async_trait;
 
+pub enum BlockWindow{
+    Latest(u64),
+    Between{from:u64, count:u64}
+}
+
 #[async_trait]
 pub trait ChainReader {
     async fn dag_view(
         &self,
-        anchor: Option<u64>,
-        count: u64,
+	window: BlockWindow
     ) -> anyhow::Result<Box<dyn DagGraphProvider + Send + Sync>>;
 }
 

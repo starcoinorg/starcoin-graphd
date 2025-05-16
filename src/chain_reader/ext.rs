@@ -4,6 +4,8 @@ use async_trait::async_trait;
 use starcoin_crypto::HashValue;
 use std::collections::{HashMap, HashSet, VecDeque};
 
+use super::BlockWindow;
+
 #[async_trait]
 pub trait ChainReaderExt: Send + Sync {
     // get selected chain by blue score number-count to number
@@ -105,8 +107,7 @@ where
 {
     async fn dag_view(
         &self,
-        anchor: Option<u64>,
-        count: u64,
+        window: BlockWindow,
     ) -> anyhow::Result<Box<dyn DagGraphProvider + Send + Sync>> {
         // Only ghostdag data for blocks on the selected chain are required.
         //
@@ -123,7 +124,12 @@ where
         //   1. The headers of all selected + mergeset blocks
         //   2. The ghostdag data of the selected chain blocks only
 
-        let selected_chain = self.get_selected_chain(anchor, count).await?;
+        let selected_chain = {
+            match window {
+                BlockWindow::Latest(n) => self.get_selected_chain(None, n).await?,
+                _ => unimplemented!(),
+            }
+        };
         let mut header_map: HashMap<_, _> =
             selected_chain.iter().map(|h| (h.id(), h.clone())).collect();
         let selected_ids: Vec<_> = header_map.keys().copied().collect();
