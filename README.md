@@ -11,7 +11,6 @@ Rust backend + React frontend, served on a single port and single binary.
 ## Usage
 
 ```bash
-./build-static.sh
 cargo run --release --network halley
 
 ```
