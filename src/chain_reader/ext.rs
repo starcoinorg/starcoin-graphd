@@ -88,6 +88,9 @@ impl DagGraphProvider for DagBuildContext {
             let selected_parent = self.ghostdag_map.get(id).map(|gd| gd.selected_parent);
 
             for parent in header.parents_hash() {
+		if !self.header_map.contains_key(&parent) {
+                    continue;
+		}
                 edges.push(DagEdge {
                     from: parent,
                     to: *id,
@@ -150,7 +153,6 @@ where
                 }
             }
         }
-
         // Collect all needed block hashes
         let mut missing = Vec::new();
         while let Some(hash) = to_fetch.pop_front() {
@@ -160,6 +162,8 @@ where
         }
 
         // Fetch all missing headers in batch
+	let min_selected_number = selected_chain.last().unwrap().number;
+
         let mut pending: HashSet<HashValue> = missing.iter().copied().collect();
         while !pending.is_empty() {
             let batch: Vec<HashValue> = pending.iter().copied().collect();
@@ -167,11 +171,13 @@ where
             for header in new_headers {
                 let id = header.id();
                 pending.remove(&id);
+		if header.number>=min_selected_number{
                 for p in header.parents_hash() {
                     if seen.insert(p) {
                         pending.insert(p);
                     }
                 }
+		}
                 header_map.insert(id, header);
             }
         }

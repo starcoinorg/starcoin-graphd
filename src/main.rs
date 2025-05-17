@@ -1,12 +1,10 @@
-use starcoin_graphd::chain_reader::mock::MockChainReader;
-use starcoin_graphd::chain_reader::BlockWindow;
-use starcoin_graphd::dag_graph::DagGraph;
-#[tokio::main]
-async fn main() -> anyhow::Result<()> {
-    let reader = MockChainReader::new();
-    let graph = DagGraph::build(&reader, BlockWindow::Latest(2)).await?;
+use anyhow::Result;
+use starcoin_graphd::prelude::*;
+use std::sync::Arc;
 
-    let json = serde_json::to_string_pretty(&graph)?;
-    std::fs::write("dag.json", json)?;
-    Ok(())
+#[tokio::main]
+async fn main() -> Result<()> {
+    let reader: Arc<dyn ChainReader> = Arc::new(RpcChainReader::new("http://127.0.0.1:32824"));
+    let builder = DagGraphBuilder::new(reader, BlockWindow::Latest(20));
+    start_server(builder).await
 }

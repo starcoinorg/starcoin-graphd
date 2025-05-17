@@ -29,4 +29,4 @@ pub trait DagGraphProvider {
 }
 
 mod graph;
-pub use graph::DagGraph;
+pub use graph::DagGraphBuilder;
