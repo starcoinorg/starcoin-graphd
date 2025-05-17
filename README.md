@@ -1,19 +1,20 @@
 # starcoin-graphd
 
-A minimal DAG visualization module for Starcoin, supporting GHOSTDAG coloring and structure analysis.
+A minimal all-in-one DAG viewer for the Starcoin blockchain.
+Rust backend + React frontend, served on a single port and single binary.
 
-This library extracts block headers and GHOSTDAG data from a `ChainReader` and constructs a renderable DAG, with support for:
+## How It Works
+- Backend: Rust with Actix-web
+- Frontend: React with Vite
+- `build-static.sh` compiles the frontend and copies it to `./static`
 
-- Blue / Red / Unknown node coloring
-- Edge identification with selected-parent marking
-- Node score extraction
-- Visualization-ready structures (e.g., for JSON or DOT output)
+## Usage
 
----
+```bash
+./build-static.sh
+cargo run --release --network halley
 
-## 🔧 Features
+```
+then open:
+http://127.0.0.1:8080
 
-- `ChainReader` and `ChainReaderExt` abstraction
--  DAG graph provider via `DagGraphProvider` trait
-- `DagGraph` struct with renderable node/edge data
-- `MockChainReader` for offline tests and development
