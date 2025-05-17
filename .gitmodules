@@ -1,3 +1,4 @@
 [submodule "frontend"]
 	path = frontend
-	url = https://github.com/starcoinorg/starcoin-graph.git
+	url = git@github.com:starcoinorg/starcoin-graph.git
+
