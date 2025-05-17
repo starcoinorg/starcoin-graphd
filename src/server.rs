@@ -1,7 +1,7 @@
+use actix_files::Files;
 use actix_web::{web, App, HttpServer, post, Responder};
 use anyhow::Result;
 use crate::dag_graph::DagGraphBuilder;
-
 
 #[post("/dag_view")]
 async fn dag_view_handler(builder: web::Data<DagGraphBuilder>) -> Result<impl Responder, actix_web::Error> {
@@ -11,13 +11,14 @@ async fn dag_view_handler(builder: web::Data<DagGraphBuilder>) -> Result<impl Re
     Ok(web::Json(graph))
 }
 
-pub async fn start_server(builder: DagGraphBuilder) -> Result<()> {
+pub async fn start_server(builder: DagGraphBuilder,listen: &str) -> Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(builder.clone()))
             .service(dag_view_handler)
+            .service(Files::new("/", "./static").index_file("index.html"))
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(&listen)?
     .run()
     .await?;
 

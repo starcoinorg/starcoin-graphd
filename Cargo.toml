@@ -13,6 +13,8 @@ anyhow = "~1"
 reqwest = { version = "0.12.15", features = ["json"] }
 hex = "0.4.3"
 actix-web = "~4"
+actix-files = "~0.6"
+clap = { version = "4.5", features = ["derive"] }
 [[bin]]
 name = "starcoin-graphd"
 path = "src/main.rs"
